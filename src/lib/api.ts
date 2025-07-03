@@ -147,6 +147,17 @@ export async function getGroups(groupIds: string[]) {
   }))
 }
 
+export async function getAllGroups() {
+  return (
+    await prisma.group.findMany({
+      include: { _count: { select: { participants: true } } },
+    })
+  ).map((group) => ({
+    ...group,
+    createdAt: group.createdAt.toISOString(),
+  }))
+}
+
 export async function updateExpense(
   groupId: string,
   expenseId: string,

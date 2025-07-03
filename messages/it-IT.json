@@ -253,6 +253,8 @@
     }
   },
   "Balances": {
+    "loadingBalances": "Caricamento bilancio totale",
+    "totalBalance": "Bilancio totale",
     "title": "Bilanci",
     "description": "Questo è l'importo che ciascun partecipante ha pagato o deve pagare.",
     "Reimbursements": {

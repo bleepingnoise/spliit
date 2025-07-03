@@ -15,12 +15,33 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useToast } from '@/components/ui/use-toast'
+import { trpc } from '@/trpc/client'
 import { AppRouterOutput } from '@/trpc/routers/_app'
 import { StarFilledIcon } from '@radix-ui/react-icons'
 import { Calendar, MoreHorizontal, Star, Users } from 'lucide-react'
 import { useLocale, useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { BalancesList } from './[groupId]/balances-list'
+
+type Props = {
+  group: any
+}
+
+export function RecentGroupBalance({ group }: Props) {
+  const { data, isLoading } = trpc.balances.list.useQuery({
+    groupId: group.id,
+  })
+  if (isLoading || !data) return <div></div>
+
+  return (
+    <BalancesList
+      balances={data.balances}
+      participants={group.participants}
+      currency={group.currency}
+    />
+  )
+}
 
 export function RecentGroupListCard({
   group,
@@ -40,6 +61,9 @@ export function RecentGroupListCard({
   const toast = useToast()
   const t = useTranslations('Groups')
 
+  const { data, isLoading } = trpc.groups.get.useQuery({
+    groupId: group.id,
+  })
   return (
     <li key={group.id}>
       <Button
@@ -151,6 +175,11 @@ export function RecentGroupListCard({
                 </div>
               )}
             </div>
+            {data && data.group ? (
+              <RecentGroupBalance group={data?.group}></RecentGroupBalance>
+            ) : (
+              <div></div>
+            )}
           </div>
         </div>
       </Button>

@@ -14,6 +14,7 @@ import { Loader2 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import Link from 'next/link'
 import { PropsWithChildren, useEffect, useState } from 'react'
+import { BalancesList } from './[groupId]/balances-list'
 import { RecentGroupListCard } from './recent-group-list-card'
 
 export type RecentGroupsState =
@@ -82,12 +83,45 @@ export function RecentGroupList() {
   if (state.status === 'pending') return null
 
   return (
-    <RecentGroupList_
-      groups={state.groups}
-      starredGroups={state.starredGroups}
-      archivedGroups={state.archivedGroups}
-      refreshGroupsFromStorage={() => loadGroups()}
-    />
+    <div>
+      <TotalBalances></TotalBalances>
+      <RecentGroupList_
+        groups={state.groups}
+        starredGroups={state.starredGroups}
+        archivedGroups={state.archivedGroups}
+        refreshGroupsFromStorage={() => loadGroups()}
+      />
+    </div>
+  )
+}
+
+function TotalBalances() {
+  const t = useTranslations('Balances')
+  const { data, isLoading } = trpc.balances.total.useQuery(null)
+  return (
+    <div>
+      {isLoading ? (
+        <p>
+          <Loader2 className="w-4 m-4 mr-2 inline animate-spin" />{' '}
+          {t('loadingBalances')}
+        </p>
+      ) : (
+        <div className="mb-4">
+          <h1 className="font-bold text-2xl flex-1">{t('totalBalance')}</h1>
+          <BalancesList
+            balances={data!.balances}
+            participants={Object.keys(data!.balances).map((x) => {
+              return {
+                id: x,
+                name: x,
+                groupId: '',
+              }
+            })}
+            currency="€"
+          />
+        </div>
+      )}
+    </div>
   )
 }
 
